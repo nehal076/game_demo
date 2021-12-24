@@ -1,19 +1,46 @@
 part of 'game_bloc.dart';
 
-abstract class GameState {
-  const GameState();
-}
+class GameState {
+  const GameState({required this.panelData});
 
-class GameInitial extends GameState {}
+  const GameState.initial()
+      : this(
+          panelData: const [
+            PanelData(displayValues: [1, 2, 3, 4, 5], picked: false),
+            PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
+            PanelData(displayValues: [3, 4, 5, 6, 7], picked: false),
+            PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
+            PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
+          ],
+        );
 
-class AddedToCart extends GameState {
   final List<PanelData> panelData;
-  AddedToCart({required this.panelData});
+
+  GameState copyWith({
+    List<PanelData>? panelData,
+  }) {
+    return GameState(
+      panelData: panelData ?? this.panelData,
+    );
+  }
 }
 
-class SelectedAll extends GameState {
-  final List<PanelData> panelData;
-  SelectedAll({required this.panelData});
-}
+class PanelData {
+  final List<int> displayValues;
+  final bool picked;
 
-class RemovedFromCart extends GameState {}
+  const PanelData({
+    required this.displayValues,
+    required this.picked,
+  });
+
+  PanelData copyWith({
+    List<int>? displayValues,
+    bool? picked,
+  }) {
+    return PanelData(
+      displayValues: displayValues ?? this.displayValues,
+      picked: picked ?? this.picked,
+    );
+  }
+}

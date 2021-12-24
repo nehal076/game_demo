@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:velocity_x/velocity_x.dart';
+
 import 'package:game_demo/screens/games/game_bloc/game_bloc.dart';
 import 'package:game_demo/utils/colors.dart';
 import 'package:game_demo/widgets/buttons/secondary.dart';
 import 'package:game_demo/widgets/my_scaffold.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import 'game_widgets/game_widgets.dart';
 
@@ -15,45 +16,43 @@ class GameScreen extends StatefulWidget {
   _GameScreenState createState() => _GameScreenState();
 }
 
-class PanelData {
-  List<int> displayValues;
-  bool picked;
-
-  PanelData({
-    required this.displayValues,
-    required this.picked,
-  });
-}
-
 class _GameScreenState extends State<GameScreen> {
-  List<PanelData> panelData = [
-    PanelData(displayValues: [1, 2, 3, 4, 5], picked: false),
-    PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
-    PanelData(displayValues: [3, 4, 5, 6, 7], picked: false),
-    PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
-    PanelData(displayValues: [6, 7, 8, 9, 1], picked: false),
-  ];
-  int selectedi = -1;
-  final PageController pageController = PageController(initialPage: 0);
+  final _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
       child: BlocBuilder<GameBloc, GameState>(
         builder: (context, state) {
-          if (state is SelectedAll) {
-            panelData = state.panelData;
-          }
-          if (state is AddedToCart) {
-            panelData = state.panelData;
-          }
           return PageView.builder(
             itemCount: 5,
-            controller: pageController,
+            controller: _pageController,
             itemBuilder: (context, index) {
               return Column(
                 children: [
                   Text("Game $index"),
-                  _buildHeader(),
+                  _GameHeader(
+                    onLeftPressed: () {
+                      _pageController.animateToPage(
+                        1,
+                        duration: const Duration(seconds: 375),
+                        curve: Curves.easeIn,
+                      );
+                    },
+                    onRightPressed: () {
+                      _pageController.animateToPage(
+                        1,
+                        duration: const Duration(seconds: 375),
+                        curve: Curves.easeIn,
+                      );
+                    },
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -105,7 +104,7 @@ class _GameScreenState extends State<GameScreen> {
                       ),
                     ],
                   ).p8(),
-                  _buildGameRow(),
+                  _GameRow(panelData: state.panelData),
                   Row(
                     children: [
                       Expanded(
@@ -119,9 +118,7 @@ class _GameScreenState extends State<GameScreen> {
                       Expanded(
                         child: SecondaryButton(
                           onPressed: () {
-                            BlocProvider.of<GameBloc>(context).add(
-                              SelectAll(panelData: panelData),
-                            );
+                            context.read<GameBloc>().add(const SelectAll());
                           },
                           text: 'Select All 5',
                           type: ButtonType.line_art,
@@ -137,20 +134,24 @@ class _GameScreenState extends State<GameScreen> {
       ).p8(),
     );
   }
+}
 
-  _buildHeader() {
+class _GameHeader extends StatelessWidget {
+  const _GameHeader({
+    Key? key,
+    required this.onLeftPressed,
+    required this.onRightPressed,
+  }) : super(key: key);
+
+  final VoidCallback onLeftPressed;
+  final VoidCallback onRightPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         IconButton(
-          onPressed: () {
-            setState(() {
-              pageController.animateToPage(
-                1,
-                duration: const Duration(seconds: 375),
-                curve: Curves.easeIn,
-              );
-            });
-          },
+          onPressed: onLeftPressed,
           icon: const Icon(
             Icons.chevron_left,
             size: 40,
@@ -179,15 +180,7 @@ class _GameScreenState extends State<GameScreen> {
           ],
         ),
         IconButton(
-          onPressed: () {
-            setState(() {
-              pageController.animateToPage(
-                1,
-                duration: const Duration(seconds: 375),
-                curve: Curves.easeIn,
-              );
-            });
-          },
+          onPressed: onRightPressed,
           icon: const Icon(
             Icons.chevron_right,
             size: 40,
@@ -196,8 +189,15 @@ class _GameScreenState extends State<GameScreen> {
       ],
     );
   }
+}
 
-  _buildGameRow() {
+class _GameRow extends StatelessWidget {
+  const _GameRow({Key? key, required this.panelData}) : super(key: key);
+
+  final List<PanelData> panelData;
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
