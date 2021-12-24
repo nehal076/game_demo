@@ -13,3 +13,11 @@ class AddToCart extends GameEvent {
     required this.index,
   });
 }
+
+class SelectAll extends GameEvent {
+  final List<PanelData> panelData;
+
+  const SelectAll({
+    required this.panelData,
+  });
+}

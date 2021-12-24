@@ -11,4 +11,9 @@ class AddedToCart extends GameState {
   AddedToCart({required this.panelData});
 }
 
+class SelectedAll extends GameState {
+  final List<PanelData> panelData;
+  SelectedAll({required this.panelData});
+}
+
 class RemovedFromCart extends GameState {}

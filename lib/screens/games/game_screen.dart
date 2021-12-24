@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_demo/screens/games/game_bloc/game_bloc.dart';
-import 'package:game_demo/screens/games/panel_cubit/panel_data_cubit.dart';
 import 'package:game_demo/utils/colors.dart';
 import 'package:game_demo/widgets/buttons/secondary.dart';
 import 'package:game_demo/widgets/my_scaffold.dart';
@@ -39,92 +38,100 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
-      child: PageView.builder(
-        itemCount: 5,
-        controller: pageController,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              Text("Game $index"),
-              _buildHeader(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Click on ',
-                          style: TextStyle(
-                            color: ZeplinColors.brownish_grey_three,
-                            fontSize: 14,
-                            fontFamily: 'Roboto',
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'PLUS (+)',
-                          style: TextStyle(
-                            color: ZeplinColors.brownish_grey_three,
-                            fontSize: 14,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' sign to select ticket.',
-                          style: TextStyle(
-                            color: ZeplinColors.brownish_grey_three,
-                            fontSize: 14,
-                            fontFamily: 'Roboto',
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: TextStyle(
-                      color: ZeplinColors.brownish_grey_three,
-                      fontSize: 14,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    'Rs. 20.0 / Ticket',
-                    style: TextStyle(
-                      color: ZeplinColors.brownish_grey_three,
-                      fontSize: 14,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ).p8(),
-              _buildGameRow(),
-              Row(
+      child: BlocBuilder<GameBloc, GameState>(
+        builder: (context, state) {
+          if (state is SelectedAll) {
+            panelData = state.panelData;
+          }
+          if (state is AddedToCart) {
+            panelData = state.panelData;
+          }
+          return PageView.builder(
+            itemCount: 5,
+            controller: pageController,
+            itemBuilder: (context, index) {
+              return Column(
                 children: [
-                  Expanded(
-                    child: SecondaryButton(
-                      onPressed: () {},
-                      text: 'Show Next 5 Tickets',
-                      type: ButtonType.line_art,
-                    ),
-                  ),
-                  const WidthBox(12),
-                  Expanded(
-                    child: SecondaryButton(
-                      onPressed: () {
-                        setState(() {
-                          for (var i in panelData) {
-                            i.picked = true;
-                          }
-                        });
-                      },
-                      text: 'Select All 5',
-                      type: ButtonType.line_art,
-                    ),
+                  Text("Game $index"),
+                  _buildHeader(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Click on ',
+                              style: TextStyle(
+                                color: ZeplinColors.brownish_grey_three,
+                                fontSize: 14,
+                                fontFamily: 'Roboto',
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'PLUS (+)',
+                              style: TextStyle(
+                                color: ZeplinColors.brownish_grey_three,
+                                fontSize: 14,
+                                fontFamily: 'Roboto',
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' sign to select ticket.',
+                              style: TextStyle(
+                                color: ZeplinColors.brownish_grey_three,
+                                fontSize: 14,
+                                fontFamily: 'Roboto',
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: TextStyle(
+                          color: ZeplinColors.brownish_grey_three,
+                          fontSize: 14,
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'Rs. 20.0 / Ticket',
+                        style: TextStyle(
+                          color: ZeplinColors.brownish_grey_three,
+                          fontSize: 14,
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ).p8(),
+                  _buildGameRow(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SecondaryButton(
+                          onPressed: () {},
+                          text: 'Show Next 5 Tickets',
+                          type: ButtonType.line_art,
+                        ),
+                      ),
+                      const WidthBox(12),
+                      Expanded(
+                        child: SecondaryButton(
+                          onPressed: () {
+                            BlocProvider.of<GameBloc>(context).add(
+                              SelectAll(panelData: panelData),
+                            );
+                          },
+                          text: 'Select All 5',
+                          type: ButtonType.line_art,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           );
         },
       ).p8(),
@@ -191,69 +198,56 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   _buildGameRow() {
-    return BlocProvider(
-      create: (context) => GameBloc(),
-      child: ListView.builder(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: panelData.length,
-        itemBuilder: (ctx, index) {
-          return BlocBuilder<GameBloc, GameState>(
-            builder: (context, state) {
-              if (state is AddedToCart) {
-                panelData = state.panelData;
-              }
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Ball(
-                      color: panelData[index].picked
-                          ? BallColor.blue
-                          : BallColor.red,
-                      number: "D"),
-                  for (var j in panelData[index].displayValues)
-                    Ball(
-                      color: panelData[index].picked
-                          ? BallColor.green
-                          : BallColor.magenta,
-                      number: j,
+    return ListView.builder(
+      shrinkWrap: true,
+      scrollDirection: Axis.vertical,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: panelData.length,
+      itemBuilder: (ctx, index) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Ball(
+                color: panelData[index].picked ? BallColor.blue : BallColor.red,
+                number: "D"),
+            for (var j in panelData[index].displayValues)
+              Ball(
+                color: panelData[index].picked
+                    ? BallColor.green
+                    : BallColor.magenta,
+                number: j,
+              ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: panelData[index].picked
+                      ? ZeplinColors.toxic_green
+                      : ZeplinColors.grey,
+                ),
+                color:
+                    panelData[index].picked ? ZeplinColors.toxic_green : null,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  panelData[index].picked ? Icons.check : Icons.add,
+                  color: panelData[index].picked
+                      ? Colors.white
+                      : ZeplinColors.grey,
+                ),
+                onPressed: () {
+                  BlocProvider.of<GameBloc>(context).add(
+                    AddToCart(
+                      panelData: panelData,
+                      index: index,
                     ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: panelData[index].picked
-                            ? ZeplinColors.toxic_green
-                            : ZeplinColors.grey,
-                      ),
-                      color: panelData[index].picked
-                          ? ZeplinColors.toxic_green
-                          : null,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        panelData[index].picked ? Icons.check : Icons.add,
-                        color: panelData[index].picked
-                            ? Colors.white
-                            : ZeplinColors.grey,
-                      ),
-                      onPressed: () {
-                        BlocProvider.of<GameBloc>(context).add(
-                          AddToCart(
-                            panelData: panelData,
-                            index: index,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-            },
-          ).p8();
-        },
-      ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ).p8();
+      },
     );
   }
 }

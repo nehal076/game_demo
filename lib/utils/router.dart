@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_demo/screens/games/game_bloc/game_bloc.dart';
 import 'package:game_demo/screens/games/game_screen.dart';
 import 'package:game_demo/screens/games/panel_cubit/panel_data_cubit.dart';
 import 'package:game_demo/screens/home/home_cubits/game_cubit/game_cubit.dart';
@@ -11,8 +12,8 @@ class AppRouter {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => BlocProvider<GameCubit>(
-            create: (BuildContext context) => GameCubit(),
+          builder: (_) => BlocProvider<GameBloc>(
+            create: (BuildContext context) => GameBloc(),
             child: const GameScreen(),
           ),
           settings: settings,
