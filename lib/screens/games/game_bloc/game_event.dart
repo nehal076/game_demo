@@ -15,9 +15,5 @@ class AddToCart extends GameEvent {
 }
 
 class SelectAll extends GameEvent {
-  final List<PanelData> panelData;
-
-  const SelectAll({
-    required this.panelData,
-  });
+  const SelectAll();
 }
