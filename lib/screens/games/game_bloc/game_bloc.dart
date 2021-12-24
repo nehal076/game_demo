@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:game_demo/screens/games/game_screen.dart';
 
 part 'game_event.dart';
 part 'game_state.dart';
@@ -9,14 +10,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onItemAdded(AddToCart event, Emitter<GameState> emit) async {
-    // final state = this.state;
-    // if (state is HomeG) {
-    //   try {
-    //     shoppingRepository.addItemToCart(event.item);
-    //     emit(CartLoaded(cart: Cart(items: [...state.cart.items, event.item])));
-    //   } on Exception {
-    //     emit(CartError());
-    //   }
-    // }
+    List<PanelData> panelData = event.panelData;
+    int index = event.index;
+
+    panelData[index].picked = !(panelData[index].picked);
+
+    emit(AddedToCart(panelData: panelData));
   }
 }

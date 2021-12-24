@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_demo/screens/games/game_bloc/game_bloc.dart';
 import 'package:game_demo/screens/games/panel_cubit/panel_data_cubit.dart';
 import 'package:game_demo/utils/colors.dart';
 import 'package:game_demo/widgets/buttons/secondary.dart';
@@ -191,16 +192,18 @@ class _GameScreenState extends State<GameScreen> {
 
   _buildGameRow() {
     return BlocProvider(
-      create: (context) => PanelDataCubit(),
+      create: (context) => GameBloc(),
       child: ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: panelData.length,
         itemBuilder: (ctx, index) {
-          return BlocBuilder<PanelDataCubit, List>(
+          return BlocBuilder<GameBloc, GameState>(
             builder: (context, state) {
-              panelData[state[1]].picked = state[0];
+              if (state is AddedToCart) {
+                panelData = state.panelData;
+              }
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -236,12 +239,12 @@ class _GameScreenState extends State<GameScreen> {
                             : ZeplinColors.grey,
                       ),
                       onPressed: () {
-                        context
-                            .read<PanelDataCubit>()
-                            .onTap(index, !panelData[index].picked);
-                        // setState(() {
-                        //   panelData[index].picked = !panelData[index].picked;
-                        // });
+                        BlocProvider.of<GameBloc>(context).add(
+                          AddToCart(
+                            panelData: panelData,
+                            index: index,
+                          ),
+                        );
                       },
                     ),
                   ),

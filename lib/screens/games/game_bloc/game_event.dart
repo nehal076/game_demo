@@ -5,9 +5,11 @@ abstract class GameEvent {
 }
 
 class AddToCart extends GameEvent {
+  final List<PanelData> panelData;
   final int index;
 
   const AddToCart({
+    required this.panelData,
     required this.index,
   });
 }

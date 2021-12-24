@@ -6,6 +6,9 @@ abstract class GameState {
 
 class GameInitial extends GameState {}
 
-class AddedToCart extends GameState {}
+class AddedToCart extends GameState {
+  final List<PanelData> panelData;
+  AddedToCart({required this.panelData});
+}
 
 class RemovedFromCart extends GameState {}
