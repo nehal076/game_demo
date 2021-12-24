@@ -5,3 +5,7 @@ abstract class GameState {
 }
 
 class GameInitial extends GameState {}
+
+class AddedToCart extends GameState {}
+
+class RemovedFromCart extends GameState {}

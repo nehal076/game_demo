@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_demo/screens/games/panel_cubit/panel_data_cubit.dart';
 import 'package:game_demo/utils/colors.dart';
 import 'package:game_demo/widgets/buttons/secondary.dart';
 import 'package:game_demo/widgets/my_scaffold.dart';
@@ -188,53 +190,67 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   _buildGameRow() {
-    return ListView.builder(
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: panelData.length,
-      itemBuilder: (context, index) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Ball(
-                color: panelData[index].picked ? BallColor.blue : BallColor.red,
-                number: "D"),
-            for (var j in panelData[index].displayValues)
-              Ball(
-                color: panelData[index].picked
-                    ? BallColor.green
-                    : BallColor.magenta,
-                number: j,
-              ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: panelData[index].picked
-                      ? ZeplinColors.toxic_green
-                      : ZeplinColors.grey,
-                ),
-                color:
-                    panelData[index].picked ? ZeplinColors.toxic_green : null,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  panelData[index].picked ? Icons.check : Icons.add,
-                  color: panelData[index].picked
-                      ? Colors.white
-                      : ZeplinColors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    panelData[index].picked = !panelData[index].picked;
-                  });
-                },
-              ),
-            ),
-          ],
-        ).p8();
-      },
+    return BlocProvider(
+      create: (context) => PanelDataCubit(),
+      child: ListView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: panelData.length,
+        itemBuilder: (ctx, index) {
+          return BlocBuilder<PanelDataCubit, List>(
+            builder: (context, state) {
+              panelData[state[1]].picked = state[0];
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Ball(
+                      color: panelData[index].picked
+                          ? BallColor.blue
+                          : BallColor.red,
+                      number: "D"),
+                  for (var j in panelData[index].displayValues)
+                    Ball(
+                      color: panelData[index].picked
+                          ? BallColor.green
+                          : BallColor.magenta,
+                      number: j,
+                    ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: panelData[index].picked
+                            ? ZeplinColors.toxic_green
+                            : ZeplinColors.grey,
+                      ),
+                      color: panelData[index].picked
+                          ? ZeplinColors.toxic_green
+                          : null,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        panelData[index].picked ? Icons.check : Icons.add,
+                        color: panelData[index].picked
+                            ? Colors.white
+                            : ZeplinColors.grey,
+                      ),
+                      onPressed: () {
+                        context
+                            .read<PanelDataCubit>()
+                            .onTap(index, !panelData[index].picked);
+                        // setState(() {
+                        //   panelData[index].picked = !panelData[index].picked;
+                        // });
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ).p8();
+        },
+      ),
     );
   }
 }
